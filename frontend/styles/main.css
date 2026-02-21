@@ -181,6 +181,9 @@ body {
     color: var(--ink-2);
     background: rgba(47, 111, 237, 0.05);
     font-size: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
 }
 
 .step-item.placeholder {
@@ -192,6 +195,43 @@ body {
     color: var(--ink-1);
     background: #ffffff;
     border-style: solid;
+    display: block;
+}
+
+.step-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.step-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.step-title {
+    color: var(--ink-1);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.step-detail {
+    color: var(--ink-2);
+    font-size: 13px;
+}
+
+.step-encouragement {
+    color: var(--accent);
+    font-size: 12px;
 }
 
 .tabs {
