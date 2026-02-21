@@ -48,6 +48,48 @@
 
         return resp.json();
     },
+
+    async createTask(payload) {
+        const resp = await fetch(`${this.baseURL}/tasks`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!resp.ok) {
+            throw new Error(`Create task failed: ${resp.status}`);
+        }
+
+        return resp.json();
+    },
+
+    async listTasks(limit = 20) {
+        const resp = await fetch(`${this.baseURL}/tasks?limit=${limit}`);
+        if (!resp.ok) {
+            throw new Error(`List tasks failed: ${resp.status}`);
+        }
+        return resp.json();
+    },
+
+    async getTaskSteps(taskId) {
+        const resp = await fetch(`${this.baseURL}/tasks/${taskId}/steps`);
+        if (!resp.ok) {
+            throw new Error(`Get task steps failed: ${resp.status}`);
+        }
+        return resp.json();
+    },
+
+    async deleteTask(taskId) {
+        const resp = await fetch(`${this.baseURL}/tasks/${taskId}`, {
+            method: 'DELETE',
+        });
+        if (!resp.ok) {
+            throw new Error(`Delete task failed: ${resp.status}`);
+        }
+        return resp.json();
+    },
 };
 
 window.API = API;

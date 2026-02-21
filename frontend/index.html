@@ -39,6 +39,36 @@
                     <ul id="steps-list" class="steps-list">
                         <li class="step-item placeholder">生成后会显示在这里</li>
                     </ul>
+                    <div id="supplement-box" class="supplement-box hidden">
+                        <textarea
+                            id="supplement-input"
+                            class="supplement-input"
+                            placeholder="如果需要补充说明，请在这里输入"
+                        ></textarea>
+                        <button id="supplement-btn" class="btn btn-primary" type="button">补充</button>
+                    </div>
+                </div>
+
+                <div class="card history-card" aria-label="历史任务">
+                    <div class="card-title-row">
+                        <span class="card-title">历史任务</span>
+                        <button id="history-refresh-btn" class="btn btn-secondary" type="button">刷新</button>
+                    </div>
+                    <ul id="history-list" class="history-list">
+                        <li class="history-item empty">暂无历史记录</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="history-view" class="view" aria-label="历史步骤">
+                <div class="card history-detail-card">
+                    <div class="card-title-row">
+                        <span id="history-detail-title" class="card-title">历史步骤</span>
+                        <button id="history-back-btn" class="btn btn-secondary" type="button">返回主页</button>
+                    </div>
+                    <ul id="history-steps-list" class="steps-list">
+                        <li class="step-item placeholder">请选择一条历史任务</li>
+                    </ul>
                 </div>
             </section>
 

@@ -10,6 +10,7 @@ if str(ROOT_DIR) not in sys.path:
 
 from backend.app.api.routes_ai import router as ai_router
 from backend.app.api.routes_settings import router as settings_router
+from backend.app.api.routes_tasks import router as tasks_router
 
 app = FastAPI()
 app.add_middleware(
@@ -21,6 +22,7 @@ app.add_middleware(
 )
 app.include_router(ai_router)
 app.include_router(settings_router)
+app.include_router(tasks_router)
 
 
 @app.get("/health")

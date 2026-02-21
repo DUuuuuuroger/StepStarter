@@ -8,7 +8,8 @@ DB_PATH = Path(__file__).resolve().parent / "stepstarter.db"
 
 
 def now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    local_time = datetime.now().replace(second=0, microsecond=0)
+    return local_time.strftime("%Y-%m-%d %H:%M")
 
 
 def get_connection() -> sqlite3.Connection:
@@ -41,3 +42,32 @@ def init_db() -> None:
                 """,
                 ("https://api.openai.com/v1", "", None, timestamp, timestamp),
             )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS tasks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                user_input TEXT NOT NULL,
+                status TEXT NOT NULL,
+                progress INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS steps (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                task_id INTEGER NOT NULL,
+                idx INTEGER NOT NULL,
+                title TEXT NOT NULL,
+                detail TEXT,
+                encouragement TEXT,
+                done INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(task_id) REFERENCES tasks(id)
+            )
+            """
+        )
