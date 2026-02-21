@@ -1,0 +1,53 @@
+﻿const API = {
+    baseURL: 'http://127.0.0.1:8000',
+
+    async health() {
+        const resp = await fetch(`${this.baseURL}/health`);
+        if (!resp.ok) {
+            throw new Error(`Health check failed: ${resp.status}`);
+        }
+        return resp.json();
+    },
+
+    async generateSteps(input) {
+        const resp = await fetch(`${this.baseURL}/ai/steps`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ input }),
+        });
+
+        if (!resp.ok) {
+            throw new Error(`Generate steps failed: ${resp.status}`);
+        }
+
+        return resp.json();
+    },
+
+    async getSettings() {
+        const resp = await fetch(`${this.baseURL}/settings`);
+        if (!resp.ok) {
+            throw new Error(`Get settings failed: ${resp.status}`);
+        }
+        return resp.json();
+    },
+
+    async updateSettings(payload) {
+        const resp = await fetch(`${this.baseURL}/settings`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!resp.ok) {
+            throw new Error(`Update settings failed: ${resp.status}`);
+        }
+
+        return resp.json();
+    },
+};
+
+window.API = API;

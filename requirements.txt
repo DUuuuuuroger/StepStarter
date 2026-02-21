@@ -1,0 +1,69 @@
+# StepStarter - Python dependencies
+# Platform: Windows 11 / Python 3.11
+# Notes:
+# - Keep this file as the *direct* dependencies you intentionally use.
+# - Transitive dependencies (starlette/anyio/etc.) are resolved by pip.
+# - If you want a fully pinned lockfile, use pip-tools to generate one (see requirements_optimized.txt).
+
+# === Web Framework & Local API ===
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# === HTTP Client (OpenAI Compatible API calls) ===
+httpx==0.25.2
+requests==2.31.0
+
+# === Database & ORM ===
+sqlalchemy==2.0.23
+alembic==1.12.1
+
+# === Desktop WebView Container ===
+pywebview==4.3.1
+
+# === Utilities / Config ===
+python-dotenv==1.0.0
+pydantic==2.5.0
+pydantic-settings==2.0.3
+pyyaml==6.0.1
+typing-extensions==4.8.0
+click==8.1.7
+rich==13.7.0
+tqdm==4.66.1
+
+# === Logging ===
+loguru==0.7.2
+
+# === Date & Time ===
+python-dateutil==2.8.2
+tzdata==2023.3
+
+# === System & Process ===
+psutil==5.9.6
+
+# === Security (optional) ===
+cryptography==41.0.7
+
+# === Testing (dev only) ===
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-mock==3.12.0
+
+# === Dev reload helper (dev only) ===
+watchfiles==0.21.0
+
+# === Build & Packaging ===
+pyinstaller==6.3.0
+
+# === Recommended additions to reduce "missing dependency" surprises ===
+# - python-multipart: if later you add file upload endpoints in FastAPI
+# - aiofiles: if later you serve static files via Starlette/FastAPI
+# python-multipart==0.0.9
+# aiofiles==24.1.0
+
+# === AI/ML (Optional, if later do local embeddings) ===
+# sentence-transformers==2.2.2
+# torch==2.1.2
+# transformers==4.36.2
+
+# === Platform specific ===
+# pywin32==306
