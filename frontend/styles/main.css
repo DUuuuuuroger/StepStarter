@@ -212,11 +212,56 @@ body {
     background: #ffffff;
     cursor: pointer;
     transition: all 0.2s ease;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.history-text {
+    flex: 1;
+}
+
+.history-check {
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--ink-1);
+    background: #ffffff;
+}
+
+.history-list.selection-mode .history-check {
+    display: inline-flex;
+}
+
+.history-list.selection-mode .history-item {
+    cursor: default;
+}
+
+.history-item.selected .history-check {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
 .history-item:hover {
     border-color: var(--accent);
     box-shadow: 0 8px 16px rgba(47, 111, 237, 0.12);
+}
+
+.history-item.selected {
+    border-color: var(--accent);
+    background: rgba(47, 111, 237, 0.08);
+}
+
+.history-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 .history-item.empty {
@@ -365,6 +410,10 @@ body {
     opacity: 0.7;
     transform: none;
     box-shadow: none;
+}
+
+.hidden {
+    display: none !important;
 }
 
 @keyframes riseIn {

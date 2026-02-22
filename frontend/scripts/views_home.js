@@ -9,6 +9,9 @@
         this.historyDetailTitle = document.getElementById('history-detail-title');
         this.historyStepsList = document.getElementById('history-steps-list');
         this.historyBackBtn = document.getElementById('history-back-btn');
+        this.historySelectBtn = document.getElementById('history-select-btn');
+        this.historyCancelBtn = document.getElementById('history-cancel-btn');
+        this.historyDeleteBtn = document.getElementById('history-delete-btn');
         this.supplementBox = document.getElementById('supplement-box');
         this.supplementInput = document.getElementById('supplement-input');
         this.supplementBtn = document.getElementById('supplement-btn');
@@ -24,6 +27,8 @@
         this.renderToken = 0;
         this.baseInput = '';
         this.lastSavedTaskId = null;
+        this.selectionMode = false;
+        this.selectedTaskIds = new Set();
 
         this.init();
     }
@@ -37,6 +42,15 @@
         });
         this.historyBackBtn.addEventListener('click', () => {
             this.showHome();
+        });
+        this.historySelectBtn.addEventListener('click', () => {
+            this.enterSelectionMode();
+        });
+        this.historyCancelBtn.addEventListener('click', () => {
+            this.exitSelectionMode();
+        });
+        this.historyDeleteBtn.addEventListener('click', () => {
+            this.deleteSelectedTasks();
         });
         this.homeTab.addEventListener('click', () => this.showHome());
         this.settingsTab.addEventListener('click', () => this.showSettings());
@@ -106,21 +120,6 @@
         }
     }
 
-    async saveTask(userInput, data) {
-        try {
-            const result = await window.API.createTask({
-                title: data.title || '未命名任务',
-                user_input: userInput,
-                steps: data.steps || [],
-            });
-            await this.loadHistory();
-            return result.id || null;
-        } catch (error) {
-            console.error(error);
-            return null;
-        }
-    }
-
     async handleSupplement() {
         const supplement = this.supplementInput.value.trim();
         if (!supplement) {
@@ -151,6 +150,21 @@
             if (currentToken === this.renderToken) {
                 this.setSupplementLoading(false);
             }
+        }
+    }
+
+    async saveTask(userInput, data) {
+        try {
+            const result = await window.API.createTask({
+                title: data.title || '未命名任务',
+                user_input: userInput,
+                steps: data.steps || [],
+            });
+            await this.loadHistory();
+            return result.id || null;
+        } catch (error) {
+            console.error(error);
+            return null;
         }
     }
 
@@ -188,6 +202,7 @@
 
     renderHistory(items) {
         this.historyList.innerHTML = '';
+        this.historyList.classList.toggle('selection-mode', this.selectionMode);
         if (!items.length) {
             const empty = document.createElement('li');
             empty.className = 'history-item empty';
@@ -199,15 +214,94 @@
         items.forEach((item) => {
             const li = document.createElement('li');
             li.className = 'history-item';
+            li.dataset.taskId = item.id;
             li.innerHTML = `
-                <div class="history-title">${item.title}</div>
-                <div class="history-meta">${this.formatLocalTime(item.created_at)}</div>
+                <div class="history-check" aria-hidden="true">▢</div>
+                <div class="history-text">
+                    <div class="history-title">${item.title}</div>
+                    <div class="history-meta">${this.formatLocalTime(item.created_at)}</div>
+                </div>
             `;
             li.addEventListener('click', () => {
-                this.loadHistorySteps(item.id, item.title);
+                if (this.selectionMode) {
+                    this.toggleTaskSelection(li, item.id);
+                } else {
+                    this.loadHistorySteps(item.id, item.title);
+                }
             });
             this.historyList.appendChild(li);
         });
+    }
+
+    enterSelectionMode() {
+        this.selectionMode = true;
+        this.selectedTaskIds.clear();
+        this.historySelectBtn.classList.add('hidden');
+        this.historyRefreshBtn.classList.add('hidden');
+        this.historyCancelBtn.classList.remove('hidden');
+        this.historyDeleteBtn.classList.remove('hidden');
+        this.renderHistoryFromDom();
+    }
+
+    exitSelectionMode() {
+        this.selectionMode = false;
+        this.selectedTaskIds.clear();
+        this.historySelectBtn.classList.remove('hidden');
+        this.historyRefreshBtn.classList.remove('hidden');
+        this.historyCancelBtn.classList.add('hidden');
+        this.historyDeleteBtn.classList.add('hidden');
+        const selectedItems = this.historyList.querySelectorAll('.history-item.selected');
+        selectedItems.forEach((item) => item.classList.remove('selected'));
+        this.renderHistoryFromDom();
+    }
+
+    renderHistoryFromDom() {
+        this.historyList.classList.toggle('selection-mode', this.selectionMode);
+        const items = this.historyList.querySelectorAll('.history-item');
+        items.forEach((item) => {
+            const check = item.querySelector('.history-check');
+            if (check) {
+                check.textContent = item.classList.contains('selected') ? '■' : '▢';
+            }
+        });
+    }
+
+    toggleTaskSelection(element, taskId) {
+        if (this.selectedTaskIds.has(taskId)) {
+            this.selectedTaskIds.delete(taskId);
+            element.classList.remove('selected');
+            const check = element.querySelector('.history-check');
+            if (check) {
+                check.textContent = '▢';
+            }
+            return;
+        }
+        this.selectedTaskIds.add(taskId);
+        element.classList.add('selected');
+        const check = element.querySelector('.history-check');
+        if (check) {
+            check.textContent = '■';
+        }
+    }
+
+    async deleteSelectedTasks() {
+        if (!this.selectedTaskIds.size) {
+            alert('请选择要删除的历史任务');
+            return;
+        }
+
+        const ids = Array.from(this.selectedTaskIds);
+        for (const taskId of ids) {
+            try {
+                await window.API.deleteTask(taskId);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        await this.loadHistory();
+        this.exitSelectionMode();
+        this.historyStepsList.innerHTML = '<li class="step-item placeholder">请选择一条历史任务</li>';
     }
 
     async loadHistorySteps(taskId, title) {

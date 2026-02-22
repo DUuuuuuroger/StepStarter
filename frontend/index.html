@@ -52,7 +52,12 @@
                 <div class="card history-card" aria-label="历史任务">
                     <div class="card-title-row">
                         <span class="card-title">历史任务</span>
-                        <button id="history-refresh-btn" class="btn btn-secondary" type="button">刷新</button>
+                        <div class="history-actions">
+                            <button id="history-select-btn" class="btn btn-secondary" type="button">选择</button>
+                            <button id="history-refresh-btn" class="btn btn-secondary" type="button">刷新</button>
+                            <button id="history-cancel-btn" class="btn btn-secondary hidden" type="button">返回</button>
+                            <button id="history-delete-btn" class="btn btn-primary hidden" type="button">删除</button>
+                        </div>
                     </div>
                     <ul id="history-list" class="history-list">
                         <li class="history-item empty">暂无历史记录</li>
