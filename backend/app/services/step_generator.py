@@ -93,20 +93,30 @@ def _validate(result: dict[str, Any], language: str = "English") -> dict[str, An
 def _detect_language(text: str) -> str:
     if not text.strip():
         return "English"
+
+    chinese_count = len(re.findall(r"[\u4e00-\u9fff]", text))
+    latin_count = len(re.findall(r"[A-Za-z]", text))
+    french_mark_count = len(
+        re.findall(r"[àâäçéèêëîïôöùûüÿœæ]", text, re.IGNORECASE)
+    )
+
+    if chinese_count > latin_count:
+        return "Chinese"
+
+    if french_mark_count > 0:
+        return "French"
+
+    if latin_count > 0:
+        return "English"
+
     try:
         code = detect(text)
     except Exception:
-        code = ""
+        return "English"
+
     if code in {"zh", "zh-cn", "zh-tw"}:
         return "Chinese"
     if code == "fr":
-        return "French"
-    if code == "en":
-        return "English"
-    # Fallback heuristics for edge cases
-    if re.search(r"[\u4e00-\u9fff]", text):
-        return "Chinese"
-    if re.search(r"[àâäçéèêëîïôöùûüÿœæ]", text, re.IGNORECASE):
         return "French"
     return "English"
 
