@@ -2,33 +2,40 @@
     constructor() {
         this.goalInput = document.getElementById('goal-input');
         this.generateBtn = document.getElementById('generate-btn');
-        this.stepsContainer = document.getElementById('steps-container');
-        this.stepsList = document.getElementById('steps-list');
         this.historyRefreshBtn = document.getElementById('history-refresh-btn');
         this.historyList = document.getElementById('history-list');
         this.historyDetailTitle = document.getElementById('history-detail-title');
         this.historyStepsList = document.getElementById('history-steps-list');
         this.historyBackBtn = document.getElementById('history-back-btn');
+        this.historyEditBtn = document.getElementById('history-edit-btn');
+        this.historyPromptBox = document.getElementById('history-prompt-box');
+        this.historyPromptText = document.getElementById('history-prompt-text');
         this.historySelectBtn = document.getElementById('history-select-btn');
         this.historyCancelBtn = document.getElementById('history-cancel-btn');
         this.historyDeleteBtn = document.getElementById('history-delete-btn');
-        this.supplementBox = document.getElementById('supplement-box');
-        this.supplementInput = document.getElementById('supplement-input');
-        this.supplementBtn = document.getElementById('supplement-btn');
-
         this.homeTab = document.getElementById('view-home-btn');
+        this.taskTab = document.getElementById('view-task-btn');
+        this.calendarTab = document.getElementById('view-calendar-btn');
+        this.reportsTab = document.getElementById('view-reports-btn');
         this.settingsTab = document.getElementById('view-settings-btn');
         this.homeView = document.getElementById('home-view');
         this.historyView = document.getElementById('history-view');
+        this.taskView = document.getElementById('task-view');
+        this.taskSelectView = document.getElementById('task-select-view');
+        this.calendarView = document.getElementById('calendar-view');
+        this.reportsView = document.getElementById('reports-view');
         this.settingsView = document.getElementById('settings-view');
+        this.suggestionCard = document.getElementById('suggestion-card');
+        this.suggestionText = document.getElementById('suggestion-text');
+        this.suggestionAction = document.getElementById('suggestion-action');
 
-        this.loadingTimer = null;
-        this.loadingTarget = null;
         this.renderToken = 0;
-        this.baseInput = '';
-        this.lastSavedTaskId = null;
         this.selectionMode = false;
         this.selectedTaskIds = new Set();
+        this.historyItemsById = new Map();
+        this.currentHistoryTaskId = null;
+        this.currentHistorySteps = [];
+        this.homeScrollY = 0;
 
         this.init();
     }
@@ -43,6 +50,9 @@
         this.historyBackBtn.addEventListener('click', () => {
             this.showHome();
         });
+        this.historyEditBtn.addEventListener('click', () => {
+            this.openHistoryEditModal();
+        });
         this.historySelectBtn.addEventListener('click', () => {
             this.enterSelectionMode();
         });
@@ -53,38 +63,138 @@
             this.deleteSelectedTasks();
         });
         this.homeTab.addEventListener('click', () => this.showHome());
+        this.taskTab.addEventListener('click', () => this.showTask());
+        this.calendarTab.addEventListener('click', () => this.showCalendar());
+        this.reportsTab.addEventListener('click', () => this.showReports());
         this.settingsTab.addEventListener('click', () => this.showSettings());
-        this.supplementBtn.addEventListener('click', () => this.handleSupplement());
+        this.suggestionAction.addEventListener('click', () => this.openSuggestionTask());
         this.loadHistory();
+        this.loadSuggestion();
     }
 
     showHome() {
         this.homeView.classList.add('active');
         this.historyView.classList.remove('active');
+        this.taskView.classList.remove('active');
+        this.taskSelectView.classList.remove('active');
+        this.calendarView.classList.remove('active');
+        this.reportsView.classList.remove('active');
         this.settingsView.classList.remove('active');
         this.homeTab.classList.add('active');
+        this.taskTab.classList.remove('active');
+        this.calendarTab.classList.remove('active');
+        this.reportsTab.classList.remove('active');
         this.settingsTab.classList.remove('active');
         this.homeTab.setAttribute('aria-selected', 'true');
+        this.taskTab.setAttribute('aria-selected', 'false');
+        this.calendarTab.setAttribute('aria-selected', 'false');
+        this.reportsTab.setAttribute('aria-selected', 'false');
         this.settingsTab.setAttribute('aria-selected', 'false');
+        window.requestAnimationFrame(() => {
+            window.scrollTo(0, this.homeScrollY || 0);
+        });
     }
 
     showHistory() {
         this.homeView.classList.remove('active');
         this.historyView.classList.add('active');
+        this.taskView.classList.remove('active');
+        this.taskSelectView.classList.remove('active');
+        this.calendarView.classList.remove('active');
+        this.reportsView.classList.remove('active');
         this.settingsView.classList.remove('active');
         this.homeTab.classList.remove('active');
+        this.taskTab.classList.remove('active');
+        this.calendarTab.classList.remove('active');
+        this.reportsTab.classList.remove('active');
         this.settingsTab.classList.remove('active');
         this.homeTab.setAttribute('aria-selected', 'false');
+        this.taskTab.setAttribute('aria-selected', 'false');
+        this.calendarTab.setAttribute('aria-selected', 'false');
+        this.reportsTab.setAttribute('aria-selected', 'false');
+        this.settingsTab.setAttribute('aria-selected', 'false');
+        window.requestAnimationFrame(() => {
+            window.scrollTo(0, 0);
+        });
+    }
+
+    showTask() {
+        this.homeView.classList.remove('active');
+        this.historyView.classList.remove('active');
+        this.taskView.classList.add('active');
+        this.taskSelectView.classList.remove('active');
+        this.calendarView.classList.remove('active');
+        this.reportsView.classList.remove('active');
+        this.settingsView.classList.remove('active');
+        this.homeTab.classList.remove('active');
+        this.taskTab.classList.add('active');
+        this.calendarTab.classList.remove('active');
+        this.reportsTab.classList.remove('active');
+        this.settingsTab.classList.remove('active');
+        this.homeTab.setAttribute('aria-selected', 'false');
+        this.taskTab.setAttribute('aria-selected', 'true');
+        this.calendarTab.setAttribute('aria-selected', 'false');
+        this.reportsTab.setAttribute('aria-selected', 'false');
+        this.settingsTab.setAttribute('aria-selected', 'false');
+    }
+
+    showCalendar() {
+        this.homeView.classList.remove('active');
+        this.historyView.classList.remove('active');
+        this.taskView.classList.remove('active');
+        this.taskSelectView.classList.remove('active');
+        this.calendarView.classList.add('active');
+        this.reportsView.classList.remove('active');
+        this.settingsView.classList.remove('active');
+        this.homeTab.classList.remove('active');
+        this.taskTab.classList.remove('active');
+        this.calendarTab.classList.add('active');
+        this.reportsTab.classList.remove('active');
+        this.settingsTab.classList.remove('active');
+        this.homeTab.setAttribute('aria-selected', 'false');
+        this.taskTab.setAttribute('aria-selected', 'false');
+        this.calendarTab.setAttribute('aria-selected', 'true');
+        this.reportsTab.setAttribute('aria-selected', 'false');
+        this.settingsTab.setAttribute('aria-selected', 'false');
+    }
+
+    showReports() {
+        this.homeView.classList.remove('active');
+        this.historyView.classList.remove('active');
+        this.taskView.classList.remove('active');
+        this.taskSelectView.classList.remove('active');
+        this.calendarView.classList.remove('active');
+        this.reportsView.classList.add('active');
+        this.settingsView.classList.remove('active');
+        this.homeTab.classList.remove('active');
+        this.taskTab.classList.remove('active');
+        this.calendarTab.classList.remove('active');
+        this.reportsTab.classList.add('active');
+        this.settingsTab.classList.remove('active');
+        this.homeTab.setAttribute('aria-selected', 'false');
+        this.taskTab.setAttribute('aria-selected', 'false');
+        this.calendarTab.setAttribute('aria-selected', 'false');
+        this.reportsTab.setAttribute('aria-selected', 'true');
         this.settingsTab.setAttribute('aria-selected', 'false');
     }
 
     showSettings() {
         this.homeView.classList.remove('active');
         this.historyView.classList.remove('active');
+        this.taskView.classList.remove('active');
+        this.taskSelectView.classList.remove('active');
+        this.calendarView.classList.remove('active');
+        this.reportsView.classList.remove('active');
         this.settingsView.classList.add('active');
         this.homeTab.classList.remove('active');
+        this.taskTab.classList.remove('active');
+        this.calendarTab.classList.remove('active');
+        this.reportsTab.classList.remove('active');
         this.settingsTab.classList.add('active');
         this.homeTab.setAttribute('aria-selected', 'false');
+        this.taskTab.setAttribute('aria-selected', 'false');
+        this.calendarTab.setAttribute('aria-selected', 'false');
+        this.reportsTab.setAttribute('aria-selected', 'false');
         this.settingsTab.setAttribute('aria-selected', 'true');
     }
 
@@ -96,97 +206,17 @@
             return;
         }
 
-        this.setLoading(true);
-        this.renderSteps('', []);
-        this.hideSupplementBox();
-        const currentToken = ++this.renderToken;
-        this.baseInput = input;
-
-        try {
-            const data = await window.API.generateSteps(input);
-            if (currentToken !== this.renderToken) {
-                return;
-            }
-            await this.renderStepsTyping(data.title, data.steps, currentToken);
-            this.lastSavedTaskId = await this.saveTask(input, data);
-            this.showSupplementBox();
-        } catch (error) {
-            console.error(error);
-            alert('生成失败，请检查后端是否启动');
-        } finally {
-            if (currentToken === this.renderToken) {
-                this.setLoading(false);
-            }
-        }
-    }
-
-    async handleSupplement() {
-        const supplement = this.supplementInput.value.trim();
-        if (!supplement) {
-            alert('请输入补充说明');
+        if (!window.taskView) {
+            alert('任务页面尚未准备好');
             return;
         }
-
-        if (!this.baseInput) {
-            alert('请先生成步骤');
-            return;
-        }
-
-        const fullInput = `${this.baseInput}\n补充说明：${supplement}`;
-        this.setSupplementLoading(true);
-        const currentToken = ++this.renderToken;
-
+        this.generateBtn.disabled = true;
+        this.showTask();
         try {
-            const data = await window.API.generateSteps(fullInput);
-            if (currentToken !== this.renderToken) {
-                return;
-            }
-            await this.renderStepsTyping(data.title, data.steps, currentToken);
-            await this.replaceSavedTask(fullInput, data);
-        } catch (error) {
-            console.error(error);
-            alert('生成失败，请检查后端是否启动');
+            await window.taskView.generateFromInput(input);
+            this.goalInput.value = '';
         } finally {
-            if (currentToken === this.renderToken) {
-                this.setSupplementLoading(false);
-            }
-        }
-    }
-
-    async saveTask(userInput, data) {
-        try {
-            const result = await window.API.createTask({
-                title: data.title || '未命名任务',
-                user_input: userInput,
-                steps: data.steps || [],
-            });
-            await this.loadHistory();
-            return result.id || null;
-        } catch (error) {
-            console.error(error);
-            return null;
-        }
-    }
-
-    async replaceSavedTask(userInput, data) {
-        try {
-            if (this.lastSavedTaskId) {
-                await window.API.deleteTask(this.lastSavedTaskId);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-
-        try {
-            const result = await window.API.createTask({
-                title: data.title || '未命名任务',
-                user_input: userInput,
-                steps: data.steps || [],
-            });
-            this.lastSavedTaskId = result.id || null;
-            await this.loadHistory();
-        } catch (error) {
-            console.error(error);
+            this.generateBtn.disabled = false;
         }
     }
 
@@ -200,9 +230,20 @@
         }
     }
 
+    async loadSuggestion() {
+        try {
+            const result = await window.API.getNextStartSuggestion();
+            this.renderSuggestion(result);
+        } catch (error) {
+            console.error(error);
+            this.renderSuggestion(null);
+        }
+    }
+
     renderHistory(items) {
         this.historyList.innerHTML = '';
         this.historyList.classList.toggle('selection-mode', this.selectionMode);
+        this.historyItemsById.clear();
         if (!items.length) {
             const empty = document.createElement('li');
             empty.className = 'history-item empty';
@@ -212,6 +253,7 @@
         }
 
         items.forEach((item) => {
+            this.historyItemsById.set(item.id, item);
             const li = document.createElement('li');
             li.className = 'history-item';
             li.dataset.taskId = item.id;
@@ -219,18 +261,45 @@
                 <div class="history-check" aria-hidden="true">▢</div>
                 <div class="history-text">
                     <div class="history-title">${item.title}</div>
-                    <div class="history-meta">${this.formatLocalTime(item.created_at)}</div>
+                    <div class="history-meta">${this.formatHistoryMeta(item)}</div>
                 </div>
             `;
             li.addEventListener('click', () => {
                 if (this.selectionMode) {
                     this.toggleTaskSelection(li, item.id);
                 } else {
-                    this.loadHistorySteps(item.id, item.title);
+                    this.loadHistorySteps(item);
                 }
             });
             this.historyList.appendChild(li);
         });
+    }
+
+    renderSuggestion(data) {
+        if (!this.suggestionCard || !this.suggestionText || !this.suggestionAction) {
+            return;
+        }
+        if (!data || !data.task) {
+            this.suggestionText.textContent = '暂无可启动的任务';
+            this.suggestionAction.classList.add('hidden');
+            this.suggestionCard.classList.remove('hidden');
+            return;
+        }
+        const taskTitle = data.task.title || '未命名任务';
+        const stepTitle = data.step ? data.step.title : '请选择一个步骤开始';
+        this.suggestionText.textContent = `先从「${taskTitle}」开始：${stepTitle}`;
+        this.suggestionAction.dataset.taskId = String(data.task.id);
+        this.suggestionAction.classList.remove('hidden');
+        this.suggestionCard.classList.remove('hidden');
+    }
+
+    async openSuggestionTask() {
+        const taskId = Number(this.suggestionAction.dataset.taskId || 0);
+        if (!taskId || !window.taskView) {
+            return;
+        }
+        await window.taskView.loadTaskById(taskId);
+        this.showTask();
     }
 
     enterSelectionMode() {
@@ -304,11 +373,20 @@
         this.historyStepsList.innerHTML = '<li class="step-item placeholder">请选择一条历史任务</li>';
     }
 
-    async loadHistorySteps(taskId, title) {
+    async loadHistorySteps(item) {
+        const taskId = item.id;
+        const title = item.title;
         try {
-            const result = await window.API.getTaskSteps(taskId);
+            this.homeScrollY = window.scrollY || 0;
+            const [taskInfo, result] = await Promise.all([
+                window.API.getTask(taskId),
+                window.API.getTaskSteps(taskId),
+            ]);
             const steps = result.items || [];
             this.renderHistorySteps(title, steps);
+            this.currentHistoryTaskId = taskId;
+            this.currentHistorySteps = steps;
+            this.renderHistoryPrompt(taskInfo.user_input || '');
             this.showHistory();
         } catch (error) {
             console.error(error);
@@ -319,6 +397,7 @@
     renderHistorySteps(title, steps) {
         this.historyDetailTitle.textContent = title || '历史步骤';
         this.historyStepsList.innerHTML = '';
+        this.renderHistoryPrompt('');
         if (!steps.length) {
             const empty = document.createElement('li');
             empty.className = 'step-item placeholder';
@@ -342,6 +421,19 @@
         });
     }
 
+    renderHistoryPrompt(text) {
+        if (!this.historyPromptBox || !this.historyPromptText) {
+            return;
+        }
+        if (!text) {
+            this.historyPromptBox.classList.add('hidden');
+            this.historyPromptText.textContent = '';
+            return;
+        }
+        this.historyPromptText.textContent = text;
+        this.historyPromptBox.classList.remove('hidden');
+    }
+
     formatLocalTime(value) {
         if (!value) {
             return '';
@@ -357,137 +449,191 @@
         return `${datePart} ${timePart}`;
     }
 
-    setLoading(isLoading) {
-        if (isLoading) {
-            this.generateBtn.disabled = true;
-            this.startLoadingDots(this.generateBtn);
-        } else {
-            this.generateBtn.disabled = false;
-            this.generateBtn.textContent = '生成步骤';
-            this.stopLoadingDots();
-        }
+    formatHistoryMeta(item) {
+        const timeText = this.formatLocalTime(item.created_at);
+        const progress = Number(item.progress || 0);
+        const duration = this.formatDuration(item.total_duration_seconds || 0);
+        const durationText = duration ? ` · 用时 ${duration}` : '';
+        return `${timeText} · 进度 ${progress}%${durationText}`;
     }
 
-    setSupplementLoading(isLoading) {
-        if (isLoading) {
-            this.supplementBtn.disabled = true;
-            this.startLoadingDots(this.supplementBtn);
-        } else {
-            this.supplementBtn.disabled = false;
-            this.supplementBtn.textContent = '补充';
-            this.stopLoadingDots();
+    formatDuration(totalSeconds) {
+        const seconds = Math.max(Number(totalSeconds) || 0, 0);
+        if (!seconds) {
+            return '';
         }
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const mins = minutes.toString().padStart(2, '0');
+        const secs = (seconds % 60).toString().padStart(2, '0');
+        if (hours > 0) {
+            return `${hours}:${mins}:${secs}`;
+        }
+        return `${minutes}:${secs}`;
     }
 
-    startLoadingDots(targetButton) {
-        this.stopLoadingDots();
-        this.loadingTarget = targetButton;
-        let dots = 0;
-        targetButton.textContent = '生成中';
-        this.loadingTimer = setInterval(() => {
-            dots = (dots + 1) % 4;
-            if (this.loadingTarget) {
-                this.loadingTarget.textContent = `生成中${'.'.repeat(dots)}`;
-            }
-        }, 400);
-    }
-
-    stopLoadingDots() {
-        if (this.loadingTimer) {
-            clearInterval(this.loadingTimer);
-            this.loadingTimer = null;
-            this.loadingTarget = null;
+    openHistoryEditModal() {
+        if (!this.currentHistoryTaskId) {
+            alert('请先选择一条历史任务');
+            return;
         }
-    }
+        const item = this.historyItemsById.get(this.currentHistoryTaskId);
+        const progressValue = item ? Number(item.progress || 0) : 0;
+        const durationSeconds = item ? Number(item.total_duration_seconds || 0) : 0;
+        const initialHours = Math.floor(durationSeconds / 3600);
+        const initialMinutes = Math.floor((durationSeconds % 3600) / 60);
 
-    renderSteps(title, steps) {
-        this.stepsList.innerHTML = '';
-
-        if (title) {
-            const headerItem = document.createElement('li');
-            headerItem.className = 'step-item header';
-            headerItem.textContent = title;
-            this.stepsList.appendChild(headerItem);
-        }
-
-        steps.forEach((step, index) => {
-            const stepData = typeof step === 'string'
-                ? { title: step, detail: '', encouragement: '' }
-                : step;
-            const item = document.createElement('li');
-            item.className = 'step-item';
-            item.innerHTML = `
-                <div class="step-number">${index + 1}</div>
-                <div class="step-content">
-                    <div class="step-title">${stepData.title || ''}</div>
-                    <div class="step-detail">${stepData.detail || ''}</div>
-                    <div class="step-encouragement">${stepData.encouragement || ''}</div>
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+            <div class="modal">
+                <div class="modal-title">编辑进度与用时</div>
+                <div class="modal-body">
+                    <label class="label">完成百分比</label>
+                    <div class="time-wheel" role="group" aria-label="进度选择器">
+                        <div class="wheel-column" data-unit="progress" aria-label="进度百分比">
+                            <div class="wheel-control" data-dir="up">▲</div>
+                            <div class="wheel-window">
+                                <div class="wheel-value" id="history-progress-value">${progressValue}</div>
+                            </div>
+                            <div class="wheel-control" data-dir="down">▼</div>
+                            <div class="wheel-unit">%</div>
+                        </div>
+                    </div>
+                    <label class="label">用时（小时 / 分钟）</label>
+                    <div class="time-wheel" role="group" aria-label="用时选择器">
+                        <div class="wheel-column" data-unit="hours" aria-label="小时">
+                            <div class="wheel-control" data-dir="up">▲</div>
+                            <div class="wheel-window">
+                                <div class="wheel-value" id="history-duration-hours">${initialHours}</div>
+                            </div>
+                            <div class="wheel-control" data-dir="down">▼</div>
+                            <div class="wheel-unit">小时</div>
+                        </div>
+                        <div class="wheel-column" data-unit="minutes" aria-label="分钟">
+                            <div class="wheel-control" data-dir="up">▲</div>
+                            <div class="wheel-window">
+                                <div class="wheel-value" id="history-duration-minutes">${initialMinutes}</div>
+                            </div>
+                            <div class="wheel-control" data-dir="down">▼</div>
+                            <div class="wheel-unit">分钟</div>
+                        </div>
+                    </div>
                 </div>
-            `;
-            this.stepsList.appendChild(item);
+                <div class="modal-actions">
+                    <button id="history-edit-cancel" class="btn btn-secondary" type="button">取消</button>
+                    <button id="history-edit-submit" class="btn btn-primary" type="button">保存</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        let currentHours = initialHours;
+        let currentMinutes = initialMinutes;
+        let currentProgress = Math.round(progressValue / 5) * 5;
+
+        const progressEl = overlay.querySelector('#history-progress-value');
+        const hoursEl = overlay.querySelector('#history-duration-hours');
+        const minutesEl = overlay.querySelector('#history-duration-minutes');
+
+        const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+        const renderTime = () => {
+            progressEl.textContent = String(currentProgress);
+            hoursEl.textContent = String(currentHours);
+            minutesEl.textContent = String(currentMinutes).padStart(2, '0');
+        };
+        const animateValue = (element, delta) => {
+            const className = delta >= 0 ? 'wheel-animate-up' : 'wheel-animate-down';
+            element.classList.remove('wheel-animate-up', 'wheel-animate-down');
+            void element.offsetWidth;
+            element.classList.add(className);
+            window.setTimeout(() => {
+                element.classList.remove(className);
+            }, 180);
+        };
+        const adjust = (unit, delta) => {
+            if (unit === 'progress') {
+                let next = currentProgress + delta * 5;
+                if (next > 100) {
+                    next = 0;
+                } else if (next < 0) {
+                    next = 100;
+                }
+                if (next !== currentProgress) {
+                    currentProgress = next;
+                    animateValue(progressEl, delta);
+                }
+            } else if (unit === 'hours') {
+                const next = clamp(currentHours + delta, 0, 999);
+                if (next !== currentHours) {
+                    currentHours = next;
+                    animateValue(hoursEl, delta);
+                }
+            } else {
+                let next = currentMinutes + delta;
+                if (next > 59) {
+                    next = 0;
+                } else if (next < 0) {
+                    next = 59;
+                }
+                if (next !== currentMinutes) {
+                    currentMinutes = next;
+                    animateValue(minutesEl, delta);
+                }
+            }
+            renderTime();
+        };
+
+        overlay.querySelectorAll('.wheel-column').forEach((column) => {
+            const unit = column.dataset.unit;
+            column.addEventListener('wheel', (event) => {
+                event.preventDefault();
+                const delta = event.deltaY > 0 ? 1 : -1;
+                adjust(unit, delta);
+            }, { passive: false });
+            column.querySelectorAll('.wheel-control').forEach((control) => {
+                control.addEventListener('click', () => {
+                    const dir = control.dataset.dir === 'up' ? 1 : -1;
+                    adjust(unit, dir);
+                });
+            });
         });
-    }
 
-    async renderStepsTyping(title, steps, token) {
-        this.stepsList.innerHTML = '';
-        if (title) {
-            const headerItem = document.createElement('li');
-            headerItem.className = 'step-item header';
-            headerItem.textContent = title;
-            this.stepsList.appendChild(headerItem);
-        }
+        renderTime();
 
-        for (let i = 0; i < steps.length; i += 1) {
-            if (token !== this.renderToken) {
-                return;
+        const closeModal = () => {
+            overlay.remove();
+        };
+
+        overlay.addEventListener('click', (event) => {
+            if (event.target === overlay) {
+                closeModal();
             }
-            const stepData = typeof steps[i] === 'string'
-                ? { title: steps[i], detail: '', encouragement: '' }
-                : steps[i];
-            const item = document.createElement('li');
-            item.className = 'step-item';
-            item.innerHTML = `
-                <div class="step-number">${i + 1}</div>
-                <div class="step-content">
-                    <div class="step-title"></div>
-                    <div class="step-detail"></div>
-                    <div class="step-encouragement"></div>
-                </div>
-            `;
-            this.stepsList.appendChild(item);
+        });
 
-            const titleEl = item.querySelector('.step-title');
-            const detailEl = item.querySelector('.step-detail');
-            const encouragementEl = item.querySelector('.step-encouragement');
+        overlay.querySelector('#history-edit-cancel').addEventListener('click', () => {
+            closeModal();
+        });
 
-            await this.typeText(titleEl, stepData.title || '', token);
-            await this.typeText(detailEl, stepData.detail || '', token);
-            await this.typeText(encouragementEl, stepData.encouragement || '', token);
-        }
-    }
-
-    async typeText(element, text, token) {
-        element.textContent = '';
-        for (let i = 0; i < text.length; i += 1) {
-            if (token !== this.renderToken) {
-                return;
+        overlay.querySelector('#history-edit-submit').addEventListener('click', async () => {
+            const totalDurationSeconds = currentHours * 3600 + currentMinutes * 60;
+            try {
+                await window.API.updateTask(this.currentHistoryTaskId, {
+                    progress: currentProgress,
+                    total_duration_seconds: totalDurationSeconds,
+                });
+                await this.loadHistory();
+                await this.loadSuggestion();
+                const updatedItem = this.historyItemsById.get(this.currentHistoryTaskId);
+                if (updatedItem) {
+                    this.renderHistorySteps(updatedItem.title, this.currentHistorySteps || []);
+                }
+                closeModal();
+            } catch (error) {
+                console.error(error);
+                alert('更新失败，请检查后端');
             }
-            element.textContent += text[i];
-            await this.sleep(22);
-        }
-    }
-
-    sleep(ms) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
-    }
-
-    showSupplementBox() {
-        this.supplementBox.classList.remove('hidden');
-    }
-
-    hideSupplementBox() {
-        this.supplementBox.classList.add('hidden');
-        this.supplementInput.value = '';
+        });
     }
 }
 

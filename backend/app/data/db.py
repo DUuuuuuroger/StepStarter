@@ -55,6 +55,13 @@ def init_db() -> None:
             )
             """
         )
+        columns = {
+            row["name"] for row in conn.execute("PRAGMA table_info(tasks)").fetchall()
+        }
+        if "total_duration_seconds" not in columns:
+            conn.execute(
+                "ALTER TABLE tasks ADD COLUMN total_duration_seconds INTEGER"
+            )
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS steps (
@@ -68,6 +75,31 @@ def init_db() -> None:
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
                 FOREIGN KEY(task_id) REFERENCES tasks(id)
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS sessions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                task_id INTEGER NOT NULL,
+                start_time TEXT NOT NULL,
+                end_time TEXT NOT NULL,
+                paused_total_seconds INTEGER NOT NULL DEFAULT 0,
+                duration_seconds INTEGER NOT NULL,
+                FOREIGN KEY(task_id) REFERENCES tasks(id)
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS reports (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                period TEXT NOT NULL,
+                period_key TEXT NOT NULL,
+                content TEXT NOT NULL,
+                generated_at TEXT NOT NULL,
+                UNIQUE(period, period_key)
             )
             """
         )
