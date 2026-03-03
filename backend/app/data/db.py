@@ -1,10 +1,28 @@
 ﻿from __future__ import annotations
 
+import os
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
-DB_PATH = Path(__file__).resolve().parent / "stepstarter.db"
+def _get_db_dir() -> Path:
+    appdata = os.getenv("APPDATA")
+    if appdata:
+        base_dir = Path(appdata)
+    else:
+        roaming = Path.home() / "AppData" / "Roaming"
+        base_dir = roaming if roaming.exists() else Path.home() / "StepStarter"
+
+    if base_dir.name.lower() == "stepstarter":
+        db_dir = base_dir
+    else:
+        db_dir = base_dir / "StepStarter"
+
+    db_dir.mkdir(parents=True, exist_ok=True)
+    return db_dir
+
+
+DB_PATH = _get_db_dir() / "stepstarter.db"
 
 
 def now_iso() -> str:
