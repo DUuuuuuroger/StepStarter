@@ -1,0 +1,210 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StepStarter - 从最小一步开始</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="page">
+        <header class="hero">
+            <div class="brand">StepStarter</div>
+            <h1 class="headline">从最小一步开始</h1>
+            <p class="subhead">把想做却难启动的事情，拆成可以立刻行动的微小步骤。</p>
+        </header>
+
+        <div class="tabs" role="tablist">
+            <button id="view-home-btn" class="tab active" role="tab" aria-selected="true">主页</button>
+            <button id="view-task-btn" class="tab" role="tab" aria-selected="false">任务</button>
+            <button id="view-calendar-btn" class="tab" role="tab" aria-selected="false">日历</button>
+            <button id="view-reports-btn" class="tab" role="tab" aria-selected="false">报告</button>
+            <button id="view-settings-btn" class="tab" role="tab" aria-selected="false">设置</button>
+        </div>
+
+        <main class="content">
+            <section id="home-view" class="view active" aria-label="目标输入">
+                <div class="card input-card">
+                    <label class="label" for="goal-input">当前你想做但还没开始的事情</label>
+                    <textarea
+                        id="goal-input"
+                        class="goal-input"
+                        placeholder="例如：
+- 我想整理桌面，但觉得太乱
+- 我想学习 Python，但不知道从哪里开始
+- 我想运动，但今天没有动力"
+                    ></textarea>
+                    <button id="generate-btn" class="btn btn-primary" type="button">生成步骤</button>
+                </div>
+
+                <div id="suggestion-card" class="card suggestion-card hidden" aria-label="启动建议">
+                    <div class="card-title">今日建议</div>
+                    <div id="suggestion-text" class="suggestion-text">暂无建议</div>
+                    <button id="suggestion-action" class="btn btn-secondary hidden" type="button">查看任务</button>
+                </div>
+
+                <div class="card history-card" aria-label="历史任务">
+                    <div class="card-title-row">
+                        <span class="card-title">历史任务</span>
+                        <div class="history-actions">
+                            <button id="history-select-btn" class="btn btn-secondary" type="button">选择</button>
+                            <button id="history-refresh-btn" class="btn btn-secondary" type="button">刷新</button>
+                            <button id="history-cancel-btn" class="btn btn-secondary hidden" type="button">返回</button>
+                            <button id="history-delete-btn" class="btn btn-primary hidden" type="button">删除</button>
+                        </div>
+                    </div>
+                    <ul id="history-list" class="history-list">
+                        <li class="history-item empty">暂无历史记录</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="task-view" class="view" aria-label="任务与计时器">
+                <div class="card task-steps-card">
+                    <div class="card-title">你的步骤</div>
+                    <ul id="task-steps-list" class="steps-list">
+                        <li class="step-item placeholder">暂无步骤</li>
+                    </ul>
+                    <div id="task-supplement-box" class="supplement-box hidden">
+                        <textarea
+                            id="task-supplement-input"
+                            class="supplement-input"
+                            placeholder="如果需要补充说明，请在这里输入"
+                        ></textarea>
+                        <button id="task-supplement-btn" class="btn btn-primary" type="button">补充</button>
+                    </div>
+                </div>
+
+                <div class="card task-card">
+                    <div class="card-title-row">
+                        <span class="card-title">当前任务</span>
+                        <button id="task-select-btn" class="btn btn-secondary" type="button">选择任务</button>
+                    </div>
+                    <div id="task-title" class="task-title">------</div>
+                    <div id="task-progress" class="task-progress">进度：------</div>
+                </div>
+
+                <div class="card timer-card hidden">
+                    <div class="card-title">计时器</div>
+                    <div id="timer-display" class="timer-display">00:00:00</div>
+                    <div class="timer-actions">
+                        <button id="timer-start" class="btn btn-primary" type="button">开始</button>
+                        <button id="timer-pause" class="btn btn-secondary hidden" type="button">暂停</button>
+                        <button id="timer-stop" class="btn btn-secondary hidden" type="button">结束</button>
+                    </div>
+                    <div id="timer-status" class="status-text" aria-live="polite"></div>
+                </div>
+            </section>
+
+            <section id="task-select-view" class="view" aria-label="选择任务">
+                <div class="card task-select-card">
+                    <div class="card-title-row">
+                        <span class="card-title">选择任务</span>
+                        <button id="task-select-cancel" class="btn btn-secondary" type="button">取消</button>
+                    </div>
+                    <ul id="task-select-list" class="history-list">
+                        <li class="history-item empty">暂无历史记录</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="calendar-view" class="view" aria-label="日历">
+                <div class="card calendar-card">
+                    <div class="card-title">日历</div>
+                    <div class="calendar-header">
+                        <button id="calendar-prev" class="btn btn-secondary" type="button">←</button>
+                        <div id="calendar-month" class="calendar-month">--</div>
+                        <button id="calendar-next" class="btn btn-secondary" type="button">→</button>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="calendar-weekday">一</div>
+                        <div class="calendar-weekday">二</div>
+                        <div class="calendar-weekday">三</div>
+                        <div class="calendar-weekday">四</div>
+                        <div class="calendar-weekday">五</div>
+                        <div class="calendar-weekday">六</div>
+                        <div class="calendar-weekday">日</div>
+                        <div id="calendar-days" class="calendar-days"></div>
+                    </div>
+                    <div id="calendar-summary" class="calendar-summary">当天用时：--</div>
+                    <ul id="calendar-list" class="history-list">
+                        <li class="history-item empty">暂无记录</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="reports-view" class="view" aria-label="报告">
+                <div class="card reports-card">
+                    <div class="card-title-row">
+                        <span class="card-title">行动报告</span>
+                        <button id="reports-refresh" class="btn btn-secondary" type="button">刷新</button>
+                    </div>
+                    <div class="report-controls" role="tablist">
+                        <button id="report-tab-weekly" class="tab active" type="button">周报</button>
+                        <button id="report-tab-monthly" class="tab" type="button">月报</button>
+                        <button id="report-tab-yearly" class="tab" type="button">年报</button>
+                    </div>
+                    <div class="report-grid">
+                    <div class="report-card" id="report-single">
+                        <div class="report-header" id="report-header">--</div>
+                        <div class="report-title">--</div>
+                        <div class="report-time" id="report-generated-at">生成时间：--</div>
+                        <div class="report-metrics"></div>
+                            <div class="report-section-title">亮点</div>
+                            <ul class="report-list report-highlights"></ul>
+                            <div class="report-section-title">洞察</div>
+                            <ul class="report-list report-insights"></ul>
+                            <div class="report-section-title">建议</div>
+                            <ul class="report-list report-suggestions"></ul>
+                        </div>
+                    </div>
+                    <div id="reports-status" class="status-text"></div>
+                </div>
+            </section>
+
+            <section id="history-view" class="view" aria-label="历史步骤">
+                <div class="card history-detail-card">
+                    <div class="card-title-row">
+                        <span id="history-detail-title" class="card-title">历史步骤</span>
+                        <div class="history-actions">
+                            <button id="history-edit-btn" class="btn btn-secondary" type="button">编辑</button>
+                            <button id="history-back-btn" class="btn btn-secondary" type="button">返回主页</button>
+                        </div>
+                    </div>
+                    <div id="history-prompt-box" class="history-prompt-box hidden">
+                        <div class="label">当时输入</div>
+                        <div id="history-prompt-text" class="history-prompt-text"></div>
+                    </div>
+                    <ul id="history-steps-list" class="steps-list">
+                        <li class="step-item placeholder">请选择一条历史任务</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="settings-view" class="view" aria-label="设置">
+                <div class="card settings-card">
+                    <div class="card-title">API 设置</div>
+                    <label class="label" for="settings-base-url">Base URL</label>
+                    <input id="settings-base-url" class="text-input" type="text" placeholder="https://api.openai.com/v1" />
+
+                    <label class="label" for="settings-api-key">API Key</label>
+                    <input id="settings-api-key" class="text-input" type="password" placeholder="sk-..." />
+
+                    <label class="label" for="settings-model">Model (可选)</label>
+                    <input id="settings-model" class="text-input" type="text" placeholder="gpt-4o-mini" />
+
+                    <button id="settings-save-btn" class="btn btn-primary" type="button">保存设置</button>
+                    <div id="settings-status" class="status-text" aria-live="polite"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="scripts/api.js"></script>
+    <script src="scripts/views_task.js"></script>
+    <script src="scripts/views_calendar.js"></script>
+    <script src="scripts/views_reports.js"></script>
+    <script src="scripts/views_home.js"></script>
+    <script src="scripts/views_settings.js"></script>
+</body>
+</html>
