@@ -8,6 +8,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from threading import Thread
 from pathlib import Path
 
 import webview
@@ -19,6 +20,8 @@ ROOT_URL = f"http://{HOST}:{PORT}/"
 HEALTH_TIMEOUT_SECONDS = 10
 
 _SERVER_PROCESS: subprocess.Popen[str] | None = None
+_SERVER_LOG_HANDLE = None
+_STOPPING = False
 
 
 def get_resource_path(relative_path: str) -> Path:
@@ -44,7 +47,8 @@ def _poll_health(timeout_seconds: int) -> bool:
         try:
             with urllib.request.urlopen(HEALTH_URL, timeout=1) as response:
                 body = response.read().decode("utf-8", errors="ignore").strip().lower()
-                if body == "ok":
+                normalized = body.strip('"')
+                if normalized == "ok":
                     return True
         except (urllib.error.URLError, TimeoutError):
             time.sleep(0.3)
@@ -73,22 +77,39 @@ def _start_server_process() -> subprocess.Popen[str]:
         env["PYTHONPATH"] = str(base_dir)
         cmd = [python_exe, str(Path(__file__).resolve()), "--run-server"]
 
-    return subprocess.Popen(
+    proc = subprocess.Popen(
         cmd,
         cwd=str(base_dir),
         env=env,
         creationflags=getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0),
     )
+    return proc
 
 
 def _stop_server_process() -> None:
-    global _SERVER_PROCESS
+    global _SERVER_PROCESS, _STOPPING
+    if _STOPPING:
+        return
+    _STOPPING = True
     proc = _SERVER_PROCESS
     if not proc:
         return
     if proc.poll() is not None:
         return
-    proc.terminate()
+    try:
+        if os.name == "nt":
+            subprocess.run(
+                ["taskkill", "/T", "/F", "/PID", str(proc.pid)],
+                check=False,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+            )
+        else:
+            proc.terminate()
+    except Exception:
+        proc.terminate()
+
     try:
         proc.wait(timeout=5)
     except subprocess.TimeoutExpired:
@@ -115,11 +136,8 @@ def _run_server() -> None:
 
 
 def _open_window() -> None:
-    if _poll_health(HEALTH_TIMEOUT_SECONDS) and _root_available():
-        url = ROOT_URL
-    else:
-        local_index = get_resource_path("frontend/index.html").resolve()
-        url = str(local_index)
+    local_index = get_resource_path("frontend/index.html").resolve()
+    url = str(local_index)
 
     window = webview.create_window(
         "StepStarter",
@@ -130,7 +148,18 @@ def _open_window() -> None:
         easy_drag=False,
     )
     window.events.closed += lambda: _stop_server_process()
-    webview.start()
+
+    def _switch_to_backend() -> None:
+        if _poll_health(HEALTH_TIMEOUT_SECONDS):
+            if _root_available():
+                window.load_url(ROOT_URL)
+            else:
+                pass
+
+    def _background_tasks() -> None:
+        Thread(target=_switch_to_backend, daemon=True).start()
+
+    webview.start(_background_tasks)
 
 
 def main() -> None:
