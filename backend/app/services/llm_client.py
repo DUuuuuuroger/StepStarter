@@ -18,7 +18,7 @@ class LLMClient:
             "Content-Type": "application/json",
         }
 
-    def chat_json(self, system_prompt: str, user_prompt: str, timeout_s: float = 20.0) -> dict[str, Any]:
+    def chat_json(self, system_prompt: str, user_prompt: str, timeout_s: float = 60.0) -> dict[str, Any]:
         payload = {
             "model": self.model,
             "messages": [

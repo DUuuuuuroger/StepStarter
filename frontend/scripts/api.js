@@ -19,7 +19,18 @@
         });
 
         if (!resp.ok) {
-            throw new Error(`Generate steps failed: ${resp.status}`);
+            let detail = '';
+            try {
+                const payload = await resp.json();
+                detail = payload.detail ? `: ${payload.detail}` : '';
+            } catch (error) {
+                try {
+                    detail = `: ${await resp.text()}`;
+                } catch (err) {
+                    detail = '';
+                }
+            }
+            throw new Error(`Generate steps failed: ${resp.status}${detail}`);
         }
 
         return resp.json();

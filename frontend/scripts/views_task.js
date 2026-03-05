@@ -65,7 +65,8 @@ class TaskView {
             console.error(error);
             this.stopStepLoadingDots();
             this.renderSteps([]);
-            alert('生成失败，请检查后端是否启动');
+            const message = error && error.message ? error.message : '请检查后端是否启动';
+            alert(`生成失败：${message}`);
         } finally {
             if (currentToken === this.renderToken) {
                 this.setLoading(false);
@@ -531,7 +532,8 @@ class TaskView {
             this.showTimerCard();
         } catch (error) {
             console.error(error);
-            alert('生成失败，请检查后端是否启动');
+            const message = error && error.message ? error.message : '请检查后端是否启动';
+            alert(`生成失败：${message}`);
         } finally {
             if (currentToken === this.renderToken) {
                 this.supplementBtn.disabled = false;
