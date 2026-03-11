@@ -14,7 +14,6 @@ class TaskView {
         this.timerDisplay = document.getElementById('timer-display');
         this.timerStart = document.getElementById('timer-start');
         this.timerPause = document.getElementById('timer-pause');
-        this.timerStop = document.getElementById('timer-stop');
         this.timerStatus = document.getElementById('timer-status');
 
         this.currentTaskId = null;
@@ -32,9 +31,14 @@ class TaskView {
     }
 
     init() {
-        this.timerStart.addEventListener('click', () => this.startTimer());
-        this.timerPause.addEventListener('click', () => this.pauseTimer());
-        this.timerStop.addEventListener('click', () => this.stopTimer());
+        this.timerStart.addEventListener('click', () => {
+            if (this.timerStart.dataset.mode === 'stop') {
+                this.stopTimer();
+                return;
+            }
+            this.startTimer();
+        });
+        this.timerPause.addEventListener('click', () => (this.isTimerRunning ? this.pauseTimer() : this.startTimer()));
         this.selectBtn.addEventListener('click', () => this.openTaskSelect());
         this.selectCancel.addEventListener('click', () => this.showTaskView());
         this.supplementBtn.addEventListener('click', () => this.handleSupplement());
@@ -267,17 +271,17 @@ class TaskView {
 
     async stopTimer() {
         try {
-            const paused = await window.API.pauseTimer();
-            this.timerSeconds = paused.elapsed_seconds || this.timerSeconds;
+            const stopped = await window.API.stopTimer();
+            this.timerSeconds = stopped.duration_seconds || this.timerSeconds;
             this.isTimerRunning = false;
-            this.setTimerButtons('paused');
+            this.setTimerButtons('idle');
             this.stopLocalTimer();
             this.updateTimerDisplay();
-            this.setStatusText('已暂停');
+            this.setStatusText('');
             this.openTaskEditModal(this.timerSeconds);
         } catch (error) {
             console.error(error);
-            alert('无法结束计时，请检查后端');
+                alert('\u65e0\u6cd5\u7ed3\u675f\u8ba1\u65f6\uff0c\u8bf7\u68c0\u67e5\u540e\u7aef');
         }
     }
 
@@ -335,24 +339,27 @@ class TaskView {
 
     setTimerButtons(state) {
         if (state === 'running') {
-            this.timerStart.classList.add('hidden');
+            this.timerStart.classList.remove('hidden');
+            this.timerStart.dataset.mode = 'stop';
+            this.timerStart.textContent = '\u7ed3\u675f';
             this.timerPause.classList.remove('hidden');
-            this.timerStop.classList.remove('hidden');
+            this.timerPause.textContent = '\u6682\u505c';
             return;
         }
 
         if (state === 'paused') {
             this.timerStart.classList.remove('hidden');
-            this.timerStart.textContent = '继续';
-            this.timerPause.classList.add('hidden');
-            this.timerStop.classList.remove('hidden');
+            this.timerStart.dataset.mode = 'stop';
+            this.timerStart.textContent = '\u7ed3\u675f';
+            this.timerPause.classList.remove('hidden');
+            this.timerPause.textContent = '\u7ee7\u7eed';
             return;
         }
 
         this.timerStart.classList.remove('hidden');
-        this.timerStart.textContent = '开始';
+        this.timerStart.dataset.mode = 'start';
+        this.timerStart.textContent = '\u5f00\u59cb';
         this.timerPause.classList.add('hidden');
-        this.timerStop.classList.add('hidden');
     }
 
     updateTimerDisplay() {
@@ -730,7 +737,7 @@ class TaskView {
                 this.isTimerRunning = true;
                 this.setTimerButtons('running');
                 this.startLocalTimer();
-                this.setStatusText('计时中');
+                this.setStatusText('\u8ba1\u65f6\u4e2d');
             } catch (error) {
                 console.error(error);
             }
@@ -738,7 +745,6 @@ class TaskView {
 
         overlay.querySelector('#task-edit-submit').addEventListener('click', async () => {
             try {
-                const stopData = await window.API.stopTimer();
                 const totalDurationSeconds = currentHours * 3600 + currentMinutes * 60;
                 await window.API.updateTask(this.currentTaskId, {
                     progress: currentProgress,
@@ -749,8 +755,8 @@ class TaskView {
                 this.setTimerButtons('idle');
                 this.stopLocalTimer();
                 this.updateTimerDisplay();
-                this.setStatusText(`已结束，本次时长 ${this.formatTime(stopData.duration_seconds || 0)}`);
-                this.taskProgress.textContent = `进度：${currentProgress}%`;
+                this.setStatusText(`\u5df2\u7ed3\u675f\uff0c\u672c\u6b21\u65f6\u957f ${this.formatTime(totalDurationSeconds)}`);
+                this.taskProgress.textContent = `\u8fdb\u5ea6\uff1a${currentProgress}%`;
                 if (window.homeView) {
                     await window.homeView.loadHistory();
                     await window.homeView.loadSuggestion();
@@ -758,7 +764,7 @@ class TaskView {
                 closeModal();
             } catch (error) {
                 console.error(error);
-                alert('保存进度失败，请检查后端');
+                alert('\u65e0\u6cd5\u7ed3\u675f\u8ba1\u65f6\uff0c\u8bf7\u68c0\u67e5\u540e\u7aef');
             }
         });
     }

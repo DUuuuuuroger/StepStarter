@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StepStarter - 从最小一步开始</title>
+    <meta name="description" content="把想做却难启动的事情，拆成可以立刻行动的微小步骤">
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
@@ -14,16 +15,33 @@
             <p class="subhead">把想做却难启动的事情，拆成可以立刻行动的微小步骤。</p>
         </header>
 
-        <div class="tabs" role="tablist">
-            <button id="view-home-btn" class="tab active" role="tab" aria-selected="true">主页</button>
-            <button id="view-task-btn" class="tab" role="tab" aria-selected="false">任务</button>
-            <button id="view-calendar-btn" class="tab" role="tab" aria-selected="false">日历</button>
-            <button id="view-reports-btn" class="tab" role="tab" aria-selected="false">报告</button>
-            <button id="view-settings-btn" class="tab" role="tab" aria-selected="false">设置</button>
-        </div>
+        <!-- Modern Tab Navigation -->
+        <nav class="tabs" role="tablist" aria-label="主导航">
+            <button id="view-home-btn" class="tab active" role="tab" aria-selected="true" aria-controls="home-view">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                主页
+            </button>
+            <button id="view-task-btn" class="tab" role="tab" aria-selected="false" aria-controls="task-view">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                任务
+            </button>
+            <button id="view-calendar-btn" class="tab" role="tab" aria-selected="false" aria-controls="calendar-view">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                日历
+            </button>
+            <button id="view-reports-btn" class="tab" role="tab" aria-selected="false" aria-controls="reports-view">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+                报告
+            </button>
+            <button id="view-settings-btn" class="tab" role="tab" aria-selected="false" aria-controls="settings-view">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                设置
+            </button>
+        </nav>
 
         <main class="content">
-            <section id="home-view" class="view active" aria-label="目标输入">
+            <!-- Home View -->
+            <section id="home-view" class="view active" role="tabpanel" aria-labelledby="view-home-btn">
                 <div class="card input-card">
                     <label class="label" for="goal-input">当前你想做但还没开始的事情</label>
                     <textarea
@@ -33,123 +51,202 @@
 - 我想整理桌面，但觉得太乱
 - 我想学习 Python，但不知道从哪里开始
 - 我想运动，但今天没有动力"
+                        aria-label="输入你想完成的目标"
                     ></textarea>
-                    <button id="generate-btn" class="btn btn-primary" type="button">生成步骤</button>
+                    <button id="generate-btn" class="btn btn-primary" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="13" y1="19" x2="22" y2="10"></line><line x1="3" y1="21" x2="21" y2="3"></line></svg>
+                        生成步骤
+                    </button>
                 </div>
 
-                <div id="suggestion-card" class="card suggestion-card hidden" aria-label="启动建议">
-                    <div class="card-title">今日建议</div>
+                <div id="suggestion-card" class="card suggestion-card hidden" role="region" aria-label="今日建议">
+                    <div class="card-title-row">
+                        <span class="card-title">今日建议</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    </div>
                     <div id="suggestion-text" class="suggestion-text">暂无建议</div>
-                    <button id="suggestion-action" class="btn btn-secondary hidden" type="button">查看任务</button>
+                    <button id="suggestion-action" class="btn btn-secondary hidden" type="button">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        查看任务
+                    </button>
                 </div>
 
-                <div class="card history-card" aria-label="历史任务">
+                <div class="card history-card" role="region" aria-label="历史任务">
                     <div class="card-title-row">
                         <span class="card-title">历史任务</span>
                         <div class="history-actions">
-                            <button id="history-select-btn" class="btn btn-secondary" type="button">选择</button>
-                            <button id="history-refresh-btn" class="btn btn-secondary" type="button">刷新</button>
-                            <button id="history-cancel-btn" class="btn btn-secondary hidden" type="button">返回</button>
-                            <button id="history-delete-btn" class="btn btn-primary hidden" type="button">删除</button>
+                            <button id="history-select-btn" class="btn btn-secondary" type="button">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                选择
+                            </button>
+                            <button id="history-refresh-btn" class="btn btn-secondary" type="button" title="刷新">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                            </button>
+                            <button id="history-cancel-btn" class="btn btn-secondary hidden" type="button">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                            <button id="history-delete-btn" class="btn btn-primary hidden" type="button">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
                         </div>
                     </div>
                     <ul id="history-list" class="history-list">
-                        <li class="history-item empty">暂无历史记录</li>
+                        <li class="history-item empty">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ink-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            <span>暂无历史记录</span>
+                        </li>
                     </ul>
                 </div>
             </section>
 
-            <section id="task-view" class="view" aria-label="任务与计时器">
+            <!-- Task View -->
+            <section id="task-view" class="view" role="tabpanel" aria-labelledby="view-task-btn">
                 <div class="card task-steps-card">
-                    <div class="card-title">你的步骤</div>
+                    <div class="card-title-row">
+                        <span class="card-title">你的步骤</span>
+                        <span class="step-count" id="step-count">0 步</span>
+                    </div>
                     <ul id="task-steps-list" class="steps-list">
-                        <li class="step-item placeholder">暂无步骤</li>
+                        <li class="step-item placeholder">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            <span>暂无步骤</span>
+                        </li>
                     </ul>
                     <div id="task-supplement-box" class="supplement-box hidden">
                         <textarea
                             id="task-supplement-input"
                             class="supplement-input"
                             placeholder="如果需要补充说明，请在这里输入"
+                            aria-label="补充说明"
                         ></textarea>
-                        <button id="task-supplement-btn" class="btn btn-primary" type="button">补充</button>
+                        <button id="task-supplement-btn" class="btn btn-primary" type="button">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 13 8 8 8"></polyline><polyline points="16 16 21 16 21 21"></polyline><path d="M12 12h9"></path><path d="M12 12v9"></path></svg>
+                            补充
+                        </button>
                     </div>
                 </div>
 
                 <div class="card task-card">
                     <div class="card-title-row">
                         <span class="card-title">当前任务</span>
-                        <button id="task-select-btn" class="btn btn-secondary" type="button">选择任务</button>
+                        <button id="task-select-btn" class="btn btn-secondary" type="button">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                            选择任务
+                        </button>
                     </div>
                     <div id="task-title" class="task-title">------</div>
+                    <div class="progress-bar" id="task-progress-bar" aria-label="任务进度">
+                        <div class="progress-fill" id="task-progress-fill" style="width: 0%"></div>
+                    </div>
                     <div id="task-progress" class="task-progress">进度：------</div>
                 </div>
 
-                <div class="card timer-card hidden">
-                    <div class="card-title">计时器</div>
+                <div class="card timer-card hidden" role="region" aria-label="计时器">
+                    <div class="card-title-row">
+                        <span class="card-title">计时器</span>
+                        <span class="timer-status" id="timer-status" aria-live="polite"></span>
+                    </div>
                     <div id="timer-display" class="timer-display">00:00:00</div>
                     <div class="timer-actions">
-                        <button id="timer-start" class="btn btn-primary" type="button">开始</button>
-                        <button id="timer-pause" class="btn btn-secondary hidden" type="button">暂停</button>
-                        <button id="timer-stop" class="btn btn-secondary hidden" type="button">结束</button>
-                    </div>
-                    <div id="timer-status" class="status-text" aria-live="polite"></div>
+                        <button id="timer-start" class="btn btn-primary" type="button">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                            开始
+                        </button>
+                        <button id="timer-pause" class="btn btn-secondary hidden" type="button">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            暂停
+                        </button>
+</div>
                 </div>
             </section>
 
-            <section id="task-select-view" class="view" aria-label="选择任务">
+            <!-- Task Select View -->
+            <section id="task-select-view" class="view" role="tabpanel" aria-labelledby="view-task-btn">
                 <div class="card task-select-card">
                     <div class="card-title-row">
                         <span class="card-title">选择任务</span>
-                        <button id="task-select-cancel" class="btn btn-secondary" type="button">取消</button>
+                        <button id="task-select-cancel" class="btn btn-secondary" type="button">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            取消
+                        </button>
                     </div>
                     <ul id="task-select-list" class="history-list">
-                        <li class="history-item empty">暂无历史记录</li>
+                        <li class="history-item empty">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ink-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            <span>暂无历史记录</span>
+                        </li>
                     </ul>
                 </div>
             </section>
 
-            <section id="calendar-view" class="view" aria-label="日历">
-                <div class="card calendar-card">
-                    <div class="card-title">日历</div>
-                    <div class="calendar-header">
-                        <button id="calendar-prev" class="btn btn-secondary" type="button">←</button>
-                        <div id="calendar-month" class="calendar-month">--</div>
-                        <button id="calendar-next" class="btn btn-secondary" type="button">→</button>
+            <!-- Calendar View - Mobile App Style -->
+            <section id="calendar-view" class="view" role="tabpanel" aria-labelledby="view-calendar-btn">
+                <!-- Top nav bar -->
+                <div class="cal-topbar">
+                    <button id="calendar-prev" class="cal-nav-btn" type="button" aria-label="上个月">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
+                    <button id="calendar-next" class="cal-nav-btn" type="button" aria-label="下个月">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
+
+                <!-- Weekday header row -->
+                <div class="cal-weekdays">
+                    <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
+                </div>
+
+                <!-- Scrollable calendar body -->
+                <div class="cal-body" id="cal-body"></div>
+
+                <!-- Selected day summary + list -->
+                <div class="cal-detail" id="cal-detail">
+                    <div id="calendar-summary" class="cal-summary-row">
+                        <span class="cal-summary-label">今日用时</span>
+                        <span class="cal-summary-value">--</span>
                     </div>
-                    <div class="calendar-grid">
-                        <div class="calendar-weekday">一</div>
-                        <div class="calendar-weekday">二</div>
-                        <div class="calendar-weekday">三</div>
-                        <div class="calendar-weekday">四</div>
-                        <div class="calendar-weekday">五</div>
-                        <div class="calendar-weekday">六</div>
-                        <div class="calendar-weekday">日</div>
-                        <div id="calendar-days" class="calendar-days"></div>
-                    </div>
-                    <div id="calendar-summary" class="calendar-summary">当天用时：--</div>
                     <ul id="calendar-list" class="history-list">
-                        <li class="history-item empty">暂无记录</li>
+                        <li class="history-item empty">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ink-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <span>暂无记录</span>
+                        </li>
                     </ul>
                 </div>
             </section>
 
-            <section id="reports-view" class="view" aria-label="报告">
+            <!-- Reports View -->
+            <section id="reports-view" class="view" role="tabpanel" aria-labelledby="view-reports-btn">
                 <div class="card reports-card">
                     <div class="card-title-row">
                         <span class="card-title">行动报告</span>
-                        <button id="reports-refresh" class="btn btn-secondary" type="button">刷新</button>
+                        <button id="reports-refresh" class="btn btn-secondary" type="button" title="刷新">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                        </button>
                     </div>
-                    <div class="report-controls" role="tablist">
-                        <button id="report-tab-weekly" class="tab active" type="button">周报</button>
-                        <button id="report-tab-monthly" class="tab" type="button">月报</button>
-                        <button id="report-tab-yearly" class="tab" type="button">年报</button>
+                    <div class="report-controls" role="tablist" aria-label="报告类型">
+                        <button id="report-tab-weekly" class="tab active" type="button" aria-selected="true">周报</button>
+                        <button id="report-tab-monthly" class="tab" type="button" aria-selected="false">月报</button>
+                        <button id="report-tab-yearly" class="tab" type="button" aria-selected="false">年报</button>
                     </div>
                     <div class="report-grid">
-                    <div class="report-card" id="report-single">
-                        <div class="report-header" id="report-header">--</div>
-                        <div class="report-title">--</div>
-                        <div class="report-time" id="report-generated-at">生成时间：--</div>
-                        <div class="report-metrics"></div>
+                        <div class="report-card" id="report-single">
+                            <div class="report-header" id="report-header">--</div>
+                            <div class="report-title" id="report-title">--</div>
+                            <div class="report-time" id="report-generated-at">生成时间：--</div>
+                            <div class="report-metrics">
+                                <div class="report-metric">
+                                    <div class="report-metric-label">任务数</div>
+                                    <div class="report-metric-value" id="report-tasks">0</div>
+                                </div>
+                                <div class="report-metric">
+                                    <div class="report-metric-label">用时</div>
+                                    <div class="report-metric-value" id="report-time">0h</div>
+                                </div>
+                                <div class="report-metric">
+                                    <div class="report-metric-label">完成</div>
+                                    <div class="report-metric-value" id="report-completed">0%</div>
+                                </div>
+                            </div>
                             <div class="report-section-title">亮点</div>
                             <ul class="report-list report-highlights"></ul>
                             <div class="report-section-title">洞察</div>
@@ -162,13 +259,20 @@
                 </div>
             </section>
 
-            <section id="history-view" class="view" aria-label="历史步骤">
+            <!-- History Detail View -->
+            <section id="history-view" class="view" role="tabpanel" aria-labelledby="view-home-btn">
                 <div class="card history-detail-card">
                     <div class="card-title-row">
                         <span id="history-detail-title" class="card-title">历史步骤</span>
                         <div class="history-actions">
-                            <button id="history-edit-btn" class="btn btn-secondary" type="button">编辑</button>
-                            <button id="history-back-btn" class="btn btn-secondary" type="button">返回主页</button>
+                            <button id="history-edit-btn" class="btn btn-secondary" type="button">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                编辑
+                            </button>
+                            <button id="history-back-btn" class="btn btn-secondary" type="button">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                返回主页
+                            </button>
                         </div>
                     </div>
                     <div id="history-prompt-box" class="history-prompt-box hidden">
@@ -176,24 +280,37 @@
                         <div id="history-prompt-text" class="history-prompt-text"></div>
                     </div>
                     <ul id="history-steps-list" class="steps-list">
-                        <li class="step-item placeholder">请选择一条历史任务</li>
+                        <li class="step-item placeholder">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            <span>请选择一条历史任务</span>
+                        </li>
                     </ul>
                 </div>
             </section>
 
-            <section id="settings-view" class="view" aria-label="设置">
+            <!-- Settings View -->
+            <section id="settings-view" class="view" role="tabpanel" aria-labelledby="view-settings-btn">
                 <div class="card settings-card">
-                    <div class="card-title">API 设置</div>
-                    <label class="label" for="settings-base-url">Base URL</label>
-                    <input id="settings-base-url" class="text-input" type="text" placeholder="https://api.openai.com/v1" />
-
-                    <label class="label" for="settings-api-key">API Key</label>
-                    <input id="settings-api-key" class="text-input" type="password" placeholder="sk-..." />
-
-                    <label class="label" for="settings-model">Model (可选)</label>
-                    <input id="settings-model" class="text-input" type="text" placeholder="gpt-4o-mini" />
-
-                    <button id="settings-save-btn" class="btn btn-primary" type="button">保存设置</button>
+                    <div class="card-title-row">
+                        <span class="card-title">API 设置</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <div class="form-group">
+                        <label class="label" for="settings-base-url">Base URL</label>
+                        <input id="settings-base-url" class="text-input" type="text" placeholder="https://api.openai.com/v1" aria-label="API Base URL" />
+                    </div>
+                    <div class="form-group">
+                        <label class="label" for="settings-api-key">API Key</label>
+                        <input id="settings-api-key" class="text-input" type="password" placeholder="sk-..." aria-label="API Key" />
+                    </div>
+                    <div class="form-group">
+                        <label class="label" for="settings-model">Model (可选)</label>
+                        <input id="settings-model" class="text-input" type="text" placeholder="gpt-4o-mini" aria-label="Model Name" />
+                    </div>
+                    <button id="settings-save-btn" class="btn btn-primary" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        保存设置
+                    </button>
                     <div id="settings-status" class="status-text" aria-live="polite"></div>
                 </div>
             </section>

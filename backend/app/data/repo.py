@@ -277,6 +277,37 @@ def get_calendar_day(date_value: str) -> list[dict]:
     ]
 
 
+def get_calendar_month(year: int, month: int) -> dict:
+    """
+    Get all days in a month that have events.
+    Returns a dict with "year", "month", and "days" (list of day numbers).
+    """
+    init_db()
+    with get_connection() as conn:
+        # Get days with tasks created or sessions in the given month
+        rows = conn.execute(
+            """
+            SELECT DISTINCT CAST(strftime('%d', coalesce_date) AS INTEGER) AS day
+            FROM (
+                SELECT strftime('%Y-%m-%d', created_at) AS coalesce_date
+                FROM tasks
+                WHERE strftime('%Y', created_at) = ? AND strftime('%m', created_at) = ?
+                UNION
+                SELECT strftime('%Y-%m-%d', start_time) AS coalesce_date
+                FROM sessions
+                WHERE strftime('%Y', start_time) = ? AND strftime('%m', start_time) = ?
+            )
+            ORDER BY day
+            """,
+            (str(year), f"{month + 1:02d}", str(year), f"{month + 1:02d}"),
+        ).fetchall()
+    return {
+        "year": year,
+        "month": month + 1,
+        "days": [row["day"] for row in rows],
+    }
+
+
 def get_stats_range(start_date: str, end_date: str) -> dict:
     init_db()
     with get_connection() as conn:

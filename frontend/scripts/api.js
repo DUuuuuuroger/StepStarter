@@ -116,6 +116,14 @@
         return resp.json();
     },
 
+    async getCalendarMonth(year, month) {
+        const resp = await fetch(`${this.baseURL}/calendar/month?year=${year}&month=${month}`);
+        if (!resp.ok) {
+            throw new Error(`Get calendar month failed: ${resp.status}`);
+        }
+        return resp.json();
+    },
+
     async getWeeklyReport(week) {
         const resp = await fetch(`${this.baseURL}/reports/weekly?week=${encodeURIComponent(week)}`);
         if (!resp.ok) {
