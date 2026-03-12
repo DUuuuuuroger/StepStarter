@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import atexit
+import ctypes
 import os
 import signal
 import subprocess
@@ -39,6 +40,46 @@ def get_resource_path(relative_path: str) -> Path:
         return candidates[-1]
 
     return Path(__file__).resolve().parent / relative_path
+
+
+def _is_windows_dark_mode() -> bool:
+    if os.name != 'nt':
+        return False
+    try:
+        import winreg
+        key_path = r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path) as key:
+            value, _ = winreg.QueryValueEx(key, 'AppsUseLightTheme')
+        return value == 0
+    except Exception:
+        return False
+
+
+def _find_window_handle(title: str, timeout_seconds: float = 2.0) -> int | None:
+    if os.name != 'nt':
+        return None
+    user32 = ctypes.windll.user32
+    end = time.monotonic() + timeout_seconds
+    while time.monotonic() < end:
+        hwnd = user32.FindWindowW(None, title)
+        if hwnd:
+            return hwnd
+        time.sleep(0.05)
+    return None
+
+
+def _set_titlebar_dark(hwnd: int, enabled: bool) -> None:
+    if os.name != 'nt' or not hwnd:
+        return
+    value = ctypes.c_int(1 if enabled else 0)
+    dwmapi = ctypes.windll.dwmapi
+    # Try Win11/Win10 values
+    for attr in (20, 19):
+        try:
+            dwmapi.DwmSetWindowAttribute(hwnd, attr, ctypes.byref(value), ctypes.sizeof(value))
+            break
+        except Exception:
+            continue
 
 
 def _poll_health(timeout_seconds: int) -> bool:
@@ -156,7 +197,15 @@ def _open_window() -> None:
             else:
                 pass
 
+    def _apply_titlebar_theme() -> None:
+        if os.name != 'nt':
+            return
+        hwnd = _find_window_handle('StepStarter')
+        if hwnd:
+            _set_titlebar_dark(hwnd, _is_windows_dark_mode())
+
     def _background_tasks() -> None:
+        Thread(target=_apply_titlebar_theme, daemon=True).start()
         Thread(target=_switch_to_backend, daemon=True).start()
 
     webview.start(_background_tasks)
